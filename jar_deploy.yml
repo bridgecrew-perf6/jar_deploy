@@ -1,0 +1,30 @@
+- name: copy jar file from local to server
+  hosts: <hostname_app>
+  remote_user: root
+  tasks:
+    - name: copying file with playbook
+      become: true 
+      copy:
+        src: ~/Downloads/custom.jar
+        dest: /local/OP/OpenPages/aurora/op-ext-lib
+
+
+- name: restarting openpages
+  hosts: <hostname_app>
+  remote_user: root
+  any_errors_fatal: false
+  gather_facts: false
+  tasks:
+     - name: Stop OpenPages Application
+       command: "./stopAllServers.sh {{ was_admin }} {{ was_admin_pwd }}"
+       args:
+          chdir: "{{ op_home }}/bin"
+        become: yes
+        become_user: "{{ opuser_username }}"
+
+      - name: Start OpenPages Application
+        command: "./startAllServers.sh"
+        args:
+          chdir: "{{ op_home }}/bin"
+        become: yes
+        become_user: "{{ opuser_username }}"
